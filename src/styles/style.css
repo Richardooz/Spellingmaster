@@ -1,0 +1,71 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0b0f14;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#app {
+  width: 100%;
+  max-width: 1200px;
+  height: clamp(640px, 56vw, 900px);
+  border-radius: 32px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 32px 52px rgba(0, 0, 0, 0.42);
+  background: url('../assets/images/Background.jpg') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#home-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 32px;
+}
+
+#logo-img {
+  width: 80%;
+  max-width: 500px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.45));
+}
+
+#play-btn {
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  outline: none;
+  width: 260px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.08s ease;
+}
+
+#play-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+#play-btn:active {
+  transform: scale(0.96);
+}
