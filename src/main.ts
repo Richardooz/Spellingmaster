@@ -13,9 +13,11 @@ if (!root) {
 const uiManager = new UIManager(root as HTMLElement);
 const audioManager = new AudioManager({
 	basePath: '../assets/sounds',
-	successFile: 'success.mp3',
+	successFile: 'correct.wav',
 	failFile: 'fail.mp3',
-	defaultVolume: 0.9
+	defaultVolume: 0.9,
+	backgroundFile: 'Backsound.mp3',
+	backgroundVolume: 0.32
 });
 
 const gameManager = new GameManager(words, uiManager, audioManager);

@@ -21,6 +21,7 @@ export class GameManager {
 
   start(): void {
     const availableTopics: TopicKey[] = ['fruits', 'career', 'random'];
+    this.setBackgroundMode('menu');
     this.ui.showMenu(availableTopics);
   }
 
@@ -43,6 +44,7 @@ export class GameManager {
     const first = this.state.wordsQueue[0];
     this.state.currentWord = first;
     this.showGameView();
+    this.setBackgroundMode('game');
     this.playCurrentWord();
   }
 
@@ -73,6 +75,7 @@ export class GameManager {
 
   private handleHome(): void {
     this.audio.stop();
+    this.setBackgroundMode('menu');
     this.start();
   }
 
@@ -86,11 +89,11 @@ export class GameManager {
     }
 
     if (guess === target) {
-      await this.audio.playSuccess();
+      void this.audio.playSuccess();
       this.ui.setStatus('Correct! Loading next word...', 'success');
       this.advance();
     } else {
-      await this.audio.playFail();
+      void this.audio.playFail();
       this.ui.setStatus('Incorrect. Try again.', 'fail');
     }
   }
@@ -98,8 +101,9 @@ export class GameManager {
   private advance(): void {
     this.state.wordIndex += 1;
     if (this.state.wordIndex >= this.state.wordsQueue.length) {
-      this.ui.setStatus('Great job! You finished this list.', 'success');
-      this.start();
+      this.state.currentWord = null;
+      this.ui.showCongrats(this.state.topic as TopicKey);
+      this.setBackgroundMode('congrats');
       return;
     }
     this.state.currentWord = this.state.wordsQueue[this.state.wordIndex];
@@ -109,6 +113,16 @@ export class GameManager {
 
   private clearStatus(): void {
     this.ui.setStatus('Keep typing.', 'idle');
+  }
+
+  private setBackgroundMode(mode: 'menu' | 'game' | 'congrats'): void {
+    const volumes: Record<'menu' | 'game' | 'congrats', number> = {
+      menu: 0.32,
+      game: 0.08,
+      congrats: 0.26
+    };
+    void this.audio.startBackground();
+    this.audio.setBackgroundVolume(volumes[mode]);
   }
 
   private shuffle(list: string[]): string[] {

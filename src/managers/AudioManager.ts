@@ -3,10 +3,13 @@ export interface AudioManagerOptions {
   successFile: string;
   failFile: string;
   defaultVolume?: number;
+  backgroundFile?: string;
+  backgroundVolume?: number;
 }
 
 export class AudioManager {
   private currentAudio: HTMLAudioElement | null = null;
+  private backgroundAudio: HTMLAudioElement | null = null;
   private options: AudioManagerOptions;
   private muted = false;
 
@@ -27,6 +30,37 @@ export class AudioManager {
     await this.play(this.getSrc(this.options.failFile));
   }
 
+  async startBackground(): Promise<void> {
+    if (!this.options.backgroundFile) return;
+    if (!this.backgroundAudio) {
+      this.backgroundAudio = new Audio(this.getSrc(this.options.backgroundFile));
+      this.backgroundAudio.loop = true;
+      this.backgroundAudio.muted = this.muted;
+      if (this.options.backgroundVolume !== undefined) {
+        this.backgroundAudio.volume = this.options.backgroundVolume;
+      }
+    }
+    try {
+      await this.backgroundAudio.play();
+    } catch (error) {
+      console.error('Background audio playback failed', error);
+    }
+  }
+
+  setBackgroundVolume(volume: number): void {
+    if (this.backgroundAudio) {
+      this.backgroundAudio.volume = volume;
+    }
+  }
+
+  stopBackground(): void {
+    if (this.backgroundAudio) {
+      this.backgroundAudio.pause();
+      this.backgroundAudio.currentTime = 0;
+      this.backgroundAudio = null;
+    }
+  }
+
   stop(): void {
     if (this.currentAudio) {
       this.currentAudio.pause();
@@ -39,6 +73,9 @@ export class AudioManager {
     this.muted = !this.muted;
     if (this.currentAudio) {
       this.currentAudio.muted = this.muted;
+    }
+    if (this.backgroundAudio) {
+      this.backgroundAudio.muted = this.muted;
     }
   }
 

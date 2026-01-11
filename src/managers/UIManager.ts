@@ -17,9 +17,11 @@ export class UIManager {
   private homeSection: HTMLDivElement;
   private topicSection: HTMLDivElement;
   private gameSection: HTMLDivElement;
+  private congratsSection: HTMLDivElement;
   private inputEl!: HTMLInputElement;
   private statusEl!: HTMLDivElement;
   private topicTitle!: HTMLDivElement;
+  private congratsText!: HTMLDivElement;
 
   constructor(private root: HTMLElement) {
     this.root.classList.add(styles.app);
@@ -27,10 +29,12 @@ export class UIManager {
     this.homeSection = this.buildHome();
     this.topicSection = this.buildTopic();
     this.gameSection = this.buildGame();
+    this.congratsSection = this.buildCongrats();
 
     this.root.appendChild(this.homeSection);
     this.root.appendChild(this.topicSection);
     this.root.appendChild(this.gameSection);
+    this.root.appendChild(this.congratsSection);
 
     this.setScreen('home');
   }
@@ -52,6 +56,11 @@ export class UIManager {
   setWordHint(word: string): void {
     const mask = Array.from(word).map(() => ' _ ').join('');
     this.statusEl.textContent = mask;
+  }
+
+  showCongrats(topic: TopicKey): void {
+    this.congratsText.textContent = `You finished the ${topic.toUpperCase()} stage!`;
+    this.setScreen('congrats');
   }
 
   setInput(value: string): void {
@@ -193,25 +202,67 @@ export class UIManager {
     if (!container) return;
     container.innerHTML = '';
 
-    const topicLabels: Record<TopicKey, string> = {
-      fruits: 'Fruits',
-      career: 'Career',
-      random: 'Random'
+    const topicImages: Record<TopicKey, string> = {
+      fruits: '../assets/images/topic fruit.png',
+      career: '../assets/images/topic career.png',
+      random: '../assets/images/topic random.png'
     };
 
     topics.forEach((topic) => {
       const btn = document.createElement('button');
       btn.className = styles.topicBtn;
       btn.type = 'button';
-      btn.textContent = topicLabels[topic];
+      const img = document.createElement('img');
+      img.className = styles.topicImage;
+      img.alt = topic;
+      img.src = new URL(topicImages[topic], import.meta.url).toString();
+      btn.appendChild(img);
       btn.addEventListener('click', () => this.onTopicSelect?.(topic));
       container.appendChild(btn);
     });
   }
 
-  private setScreen(screen: 'home' | 'topic' | 'game'): void {
+  private setScreen(screen: 'home' | 'topic' | 'game' | 'congrats'): void {
     this.homeSection.style.display = screen === 'home' ? 'flex' : 'none';
     this.topicSection.style.display = screen === 'topic' ? 'flex' : 'none';
     this.gameSection.style.display = screen === 'game' ? 'flex' : 'none';
+    this.congratsSection.style.display = screen === 'congrats' ? 'flex' : 'none';
+  }
+
+  private buildCongrats(): HTMLDivElement {
+    const section = document.createElement('div');
+    section.className = `${styles.screen} ${styles.congrats}`;
+
+    const title = document.createElement('div');
+    title.className = styles.congratsTitle;
+    title.textContent = 'CONGRATULATIONS!';
+
+    this.congratsText = document.createElement('div');
+    this.congratsText.className = styles.congratsText;
+    this.congratsText.textContent = 'You finished this stage!';
+
+    const buttons = document.createElement('div');
+    buttons.className = styles.congratsButtons;
+
+    const playAgainBtn = document.createElement('button');
+    playAgainBtn.className = `${styles.iconButton} ${styles.iconPlay}`;
+    playAgainBtn.type = 'button';
+    playAgainBtn.title = 'Play again';
+    playAgainBtn.addEventListener('click', () => this.onHome?.());
+
+    const homeBtn = document.createElement('button');
+    homeBtn.className = `${styles.iconButton} ${styles.iconHome}`;
+    homeBtn.type = 'button';
+    homeBtn.title = 'Back to home';
+    homeBtn.addEventListener('click', () => this.onHome?.());
+
+    buttons.appendChild(playAgainBtn);
+    buttons.appendChild(homeBtn);
+
+    section.appendChild(title);
+    section.appendChild(this.congratsText);
+    section.appendChild(buttons);
+
+    return section;
   }
 }
